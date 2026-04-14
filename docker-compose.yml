@@ -1,10 +1,11 @@
 services:
   postgres:
-    container_name: postgres_go
+    container_name: subscriptions
     image: postgres:16.4
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: my_pass
+      POSTGRES_DB: subscriptions
       PGDATA: /data/postgres
     volumes:
       - ./postgres-data:/data/postgres
