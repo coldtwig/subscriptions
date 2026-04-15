@@ -11,15 +11,18 @@ import (
 
 type SubscriptionsHandler struct {
 	SubscriptionsRepository *SubscriptionsRepository
+	SubscriptionsService    *SubscriptionsService
 }
 
 type SubscriptionsHandlerDeps struct {
 	SubscriptionsRepository *SubscriptionsRepository
+	SubscriptionsService    *SubscriptionsService
 }
 
 func NewSubscriptionsHandler(router *http.ServeMux, deps SubscriptionsHandlerDeps) *SubscriptionsHandler {
 	handler := &SubscriptionsHandler{
 		SubscriptionsRepository: deps.SubscriptionsRepository,
+		SubscriptionsService:    deps.SubscriptionsService,
 	}
 
 	router.HandleFunc("POST /subscriptions", handler.Create())
@@ -183,7 +186,12 @@ func (handler *SubscriptionsHandler) SumAll() http.HandlerFunc {
 			return
 		}
 
-		sum, err := handler.SubscriptionsRepository.SumAll(&SubscriptionTotalFilter{
+		if from.After(to) {
+			http.Error(w, "from must be before or equal to to", http.StatusBadRequest)
+			return
+		}
+
+		sum, err := handler.SubscriptionsService.SumAll(&SubscriptionTotalFilter{
 			ServiceName: body.ServiceName,
 			UserID:      body.UserID,
 			From:        from,

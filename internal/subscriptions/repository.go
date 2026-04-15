@@ -3,6 +3,7 @@ package subscriptions
 import (
 	"subscriptions/internal/db"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm/clause"
 )
 
@@ -57,28 +58,26 @@ func (repo *SubscriptionsRepository) Delete(id uint) error {
 	return nil
 }
 
-func (repo *SubscriptionsRepository) SumAll(subTotal *SubscriptionTotalFilter) (int, error) {
+func (repo *SubscriptionsRepository) FindForTotal(subTotal *SubscriptionTotalFilter) ([]Subscription, error) {
 	var subscriptions []Subscription
 
-	// result := repo.Database.Table("subscriptions").
-	// 	Where("service_name is ?", subTotal.ServiceName).
-	// 	Where("user_id is ?", subTotal.UserID).
-	// 	Where(`
-	// 		start_date BETWEEN ? AND ?
-	// 		OR
-	// 		end_date BETWEEN ? AND ?
-	// 		OR IF end_date is NULL start_date UNDER ?
-	// 	`, subTotal.From, subTotal.To, subTotal.From, subTotal.To).
-	// 	Scan(&subscriptions)
+	query := repo.Database.DB.Model(&Subscription{}).
+		Where("deleted_at is null").
+		Where("start_date <= ?", subTotal.To).
+		Where("(end_date is null OR end_date >= ?)", subTotal.From)
 
-	// if result.Error != nil {
-	// 	return 0, result.Error
-	// }
-
-	sum := 0
-	for _, s := range subscriptions {
-		sum += s.Price
+	if subTotal.ServiceName != "" {
+		query = query.Where("service_name = ?", subTotal.ServiceName)
 	}
 
-	return sum, nil
+	if subTotal.UserID != uuid.Nil {
+		query = query.Where("user_id = ?", subTotal.UserID)
+	}
+
+	result := query.Find(&subscriptions)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return subscriptions, nil
 }

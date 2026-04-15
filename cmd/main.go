@@ -15,9 +15,13 @@ func main() {
 	// repositories
 	subscriptionsRepository := subscriptions.NewSubscriptionsRepository(database)
 
+	// services
+	subscriptionsService := subscriptions.NewSubscriptionsService(subscriptionsRepository)
+
 	// handlers
 	subscriptions.NewSubscriptionsHandler(router, subscriptions.SubscriptionsHandlerDeps{
 		SubscriptionsRepository: subscriptionsRepository,
+		SubscriptionsService:    subscriptionsService,
 	})
 
 	server := http.Server{
