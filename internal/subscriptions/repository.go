@@ -1,6 +1,7 @@
 package subscriptions
 
 import (
+	"log"
 	"subscriptions/internal/db"
 
 	"github.com/google/uuid"
@@ -20,6 +21,7 @@ func NewSubscriptionsRepository(database *db.DB) *SubscriptionsRepository {
 func (repo *SubscriptionsRepository) Create(subscription *Subscription) (*Subscription, error) {
 	result := repo.Database.DB.Create(subscription)
 	if result.Error != nil {
+		log.Printf("ERROR repository create subscription failed: %v", result.Error)
 		return nil, result.Error
 	}
 
@@ -34,6 +36,7 @@ func (repo *SubscriptionsRepository) GetAll() ([]Subscription, error) {
 		Scan(&subscriptions)
 
 	if result.Error != nil {
+		log.Printf("ERROR repository get all subscriptions failed: %v", result.Error)
 		return nil, result.Error
 	}
 
@@ -43,6 +46,7 @@ func (repo *SubscriptionsRepository) GetAll() ([]Subscription, error) {
 func (repo *SubscriptionsRepository) Update(subscription *Subscription) (*Subscription, error) {
 	result := repo.Database.DB.Clauses(clause.Returning{}).Updates(subscription)
 	if result.Error != nil {
+		log.Printf("ERROR repository update subscription failed id=%d: %v", subscription.ID, result.Error)
 		return nil, result.Error
 	}
 
@@ -52,6 +56,7 @@ func (repo *SubscriptionsRepository) Update(subscription *Subscription) (*Subscr
 func (repo *SubscriptionsRepository) Delete(id uint) error {
 	result := repo.Database.DB.Delete(&Subscription{}, id)
 	if result.Error != nil {
+		log.Printf("ERROR repository delete subscription failed id=%d: %v", id, result.Error)
 		return result.Error
 	}
 
@@ -76,6 +81,14 @@ func (repo *SubscriptionsRepository) FindForTotal(subTotal *SubscriptionTotalFil
 
 	result := query.Find(&subscriptions)
 	if result.Error != nil {
+		log.Printf(
+			"ERROR repository find subscriptions for total failed user_id=%s service_name=%s from=%s to=%s err=%v",
+			subTotal.UserID,
+			subTotal.ServiceName,
+			subTotal.From.Format("01-2006"),
+			subTotal.To.Format("01-2006"),
+			result.Error,
+		)
 		return nil, result.Error
 	}
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"subscriptions/configs"
 	"subscriptions/internal/db"
@@ -8,9 +9,12 @@ import (
 )
 
 func main() {
+	log.Println("INFO service starting")
+
 	router := http.NewServeMux()
 	config := configs.LoadConfig()
 	database := db.NewDB(config)
+	log.Println("INFO database connected")
 
 	// repositories
 	subscriptionsRepository := subscriptions.NewSubscriptionsRepository(database)
@@ -29,8 +33,10 @@ func main() {
 		Handler: router,
 	}
 
+	log.Printf("INFO http server listening on %s", server.Addr)
 	err := server.ListenAndServe()
 	if err != nil {
+		log.Printf("ERROR http server failed: %v", err)
 		panic(err)
 	}
 }

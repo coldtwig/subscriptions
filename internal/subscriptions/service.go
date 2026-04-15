@@ -1,6 +1,7 @@
 package subscriptions
 
 import "time"
+import "log"
 
 type SubscriptionsService struct {
 	SubscriptionsRepository *SubscriptionsRepository
@@ -15,10 +16,27 @@ func NewSubscriptionsService(subscriptionsRepository *SubscriptionsRepository) *
 func (service *SubscriptionsService) SumAll(subTotal *SubscriptionTotalFilter) (int, error) {
 	subscriptions, err := service.SubscriptionsRepository.FindForTotal(subTotal)
 	if err != nil {
+		log.Printf(
+			"ERROR service sum total failed user_id=%s service_name=%s from=%s to=%s err=%v",
+			subTotal.UserID,
+			subTotal.ServiceName,
+			subTotal.From.Format("01-2006"),
+			subTotal.To.Format("01-2006"),
+			err,
+		)
 		return 0, err
 	}
 
 	sum := calculateTotalForPeriod(subscriptions, subTotal.From, subTotal.To)
+	log.Printf(
+		"INFO total calculated user_id=%s service_name=%s from=%s to=%s subscriptions=%d total=%d",
+		subTotal.UserID,
+		subTotal.ServiceName,
+		subTotal.From.Format("01-2006"),
+		subTotal.To.Format("01-2006"),
+		len(subscriptions),
+		sum,
+	)
 	return sum, nil
 }
 

@@ -2,6 +2,7 @@ package subscriptions
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -39,6 +40,7 @@ func (handler *SubscriptionsHandler) Create() http.HandlerFunc {
 		var body SubscriptionsCreateRequest
 		err := json.NewDecoder(r.Body).Decode(&body)
 		if err != nil {
+			log.Printf("WARN invalid total request body: %v", err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -176,17 +178,20 @@ func (handler *SubscriptionsHandler) SumAll() http.HandlerFunc {
 
 		from, err := time.Parse("01-2006", body.From)
 		if err != nil {
+			log.Printf("WARN invalid total from format: %v", err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
 		to, err := time.Parse("01-2006", body.To)
 		if err != nil {
+			log.Printf("WARN invalid total to format: %v", err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
 		if from.After(to) {
+			log.Printf("WARN invalid total range from=%s to=%s", body.From, body.To)
 			http.Error(w, "from must be before or equal to to", http.StatusBadRequest)
 			return
 		}
