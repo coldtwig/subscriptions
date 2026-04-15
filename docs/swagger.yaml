@@ -1,0 +1,199 @@
+basePath: /
+definitions:
+  subscriptions.SubscriptionResponse:
+    properties:
+      created_at:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: integer
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  subscriptions.SubscriptionTotalRequest:
+    properties:
+      from:
+        type: string
+      service_name:
+        type: string
+      to:
+        type: string
+      user_id:
+        type: string
+    type: object
+  subscriptions.SubscriptionsCreateRequest:
+    properties:
+      end_date:
+        type: string
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        type: string
+      user_id:
+        type: string
+    required:
+    - price
+    - service_name
+    - start_date
+    - user_id
+    type: object
+  subscriptions.SubscriptionsUpdateRequest:
+    properties:
+      end_date:
+        type: string
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        type: string
+    required:
+    - price
+    - service_name
+    - start_date
+    type: object
+info:
+  contact: {}
+  description: REST service for subscriptions aggregation.
+  title: Subscriptions API
+  version: "1.0"
+paths:
+  /subscriptions:
+    get:
+      description: Returns all subscriptions.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/subscriptions.SubscriptionResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: List subscriptions
+      tags:
+      - subscriptions
+    post:
+      consumes:
+      - application/json
+      description: Creates a new subscription record. Dates are strings in MM-YYYY
+        format.
+      parameters:
+      - description: Create subscription payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/subscriptions.SubscriptionsCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/subscriptions.SubscriptionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Create subscription
+      tags:
+      - subscriptions
+  /subscriptions/{id}:
+    delete:
+      description: Deletes a subscription by ID.
+      parameters:
+      - description: Subscription ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Delete subscription
+      tags:
+      - subscriptions
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing subscription by ID. Dates are strings in MM-YYYY
+        format.
+      parameters:
+      - description: Subscription ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update subscription payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/subscriptions.SubscriptionsUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/subscriptions.SubscriptionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Update subscription
+      tags:
+      - subscriptions
+  /subscriptions/total:
+    post:
+      consumes:
+      - application/json
+      description: Calculates total subscription cost for a selected period with optional
+        user_id and service_name filters. Fields from, to, start_date, end_date use
+        MM-YYYY format.
+      parameters:
+      - description: Total calculation filter
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/subscriptions.SubscriptionTotalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Calculate total cost
+      tags:
+      - subscriptions
+schemes:
+- http
+swagger: "2.0"

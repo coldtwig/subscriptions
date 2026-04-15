@@ -1,6 +1,8 @@
 package subscriptions
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -24,4 +26,15 @@ type SubscriptionTotalRequest struct {
 	UserID      uuid.UUID `json:"user_id"`
 	From        string    `json:"from"`
 	To          string    `json:"to"`
+}
+
+type SubscriptionResponse struct {
+	ID          uint       `json:"id"`
+	ServiceName string     `json:"service_name"`
+	Price       int        `json:"price"`
+	UserID      uuid.UUID  `json:"user_id"`
+	StartDate   time.Time  `json:"start_date"`
+	EndDate     *time.Time `json:"end_date"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
 }

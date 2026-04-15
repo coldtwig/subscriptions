@@ -35,6 +35,16 @@ func NewSubscriptionsHandler(router *http.ServeMux, deps SubscriptionsHandlerDep
 	return handler
 }
 
+// Create godoc
+// @Summary Create subscription
+// @Description Creates a new subscription record. Dates are strings in MM-YYYY format.
+// @Tags subscriptions
+// @Accept json
+// @Produce json
+// @Param request body SubscriptionsCreateRequest true "Create subscription payload"
+// @Success 201 {object} SubscriptionResponse
+// @Failure 400 {string} string
+// @Router /subscriptions [post]
 func (handler *SubscriptionsHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var body SubscriptionsCreateRequest
@@ -81,6 +91,14 @@ func (handler *SubscriptionsHandler) Create() http.HandlerFunc {
 	}
 }
 
+// GetAll godoc
+// @Summary List subscriptions
+// @Description Returns all subscriptions.
+// @Tags subscriptions
+// @Produce json
+// @Success 200 {array} SubscriptionResponse
+// @Failure 400 {string} string
+// @Router /subscriptions [get]
 func (handler *SubscriptionsHandler) GetAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		subscriptions, err := handler.SubscriptionsRepository.GetAll()
@@ -95,6 +113,17 @@ func (handler *SubscriptionsHandler) GetAll() http.HandlerFunc {
 	}
 }
 
+// Update godoc
+// @Summary Update subscription
+// @Description Updates an existing subscription by ID. Dates are strings in MM-YYYY format.
+// @Tags subscriptions
+// @Accept json
+// @Produce json
+// @Param id path int true "Subscription ID"
+// @Param request body SubscriptionsUpdateRequest true "Update subscription payload"
+// @Success 200 {object} SubscriptionResponse
+// @Failure 400 {string} string
+// @Router /subscriptions/{id} [put]
 func (handler *SubscriptionsHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var body SubscriptionsUpdateRequest
@@ -147,6 +176,14 @@ func (handler *SubscriptionsHandler) Update() http.HandlerFunc {
 	}
 }
 
+// Delete godoc
+// @Summary Delete subscription
+// @Description Deletes a subscription by ID.
+// @Tags subscriptions
+// @Param id path int true "Subscription ID"
+// @Success 204 {string} string
+// @Failure 400 {string} string
+// @Router /subscriptions/{id} [delete]
 func (handler *SubscriptionsHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idString := r.PathValue("id")
@@ -167,6 +204,16 @@ func (handler *SubscriptionsHandler) Delete() http.HandlerFunc {
 	}
 }
 
+// SumAll godoc
+// @Summary Calculate total cost
+// @Description Calculates total subscription cost for a selected period with optional user_id and service_name filters. Fields from, to, start_date, end_date use MM-YYYY format.
+// @Tags subscriptions
+// @Accept json
+// @Produce json
+// @Param request body SubscriptionTotalRequest true "Total calculation filter"
+// @Success 200 {integer} int
+// @Failure 400 {string} string
+// @Router /subscriptions/total [post]
 func (handler *SubscriptionsHandler) SumAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var body SubscriptionTotalRequest
