@@ -56,3 +56,29 @@ func (repo *SubscriptionsRepository) Delete(id uint) error {
 
 	return nil
 }
+
+func (repo *SubscriptionsRepository) SumAll(subTotal *SubscriptionTotalFilter) (int, error) {
+	var subscriptions []Subscription
+
+	// result := repo.Database.Table("subscriptions").
+	// 	Where("service_name is ?", subTotal.ServiceName).
+	// 	Where("user_id is ?", subTotal.UserID).
+	// 	Where(`
+	// 		start_date BETWEEN ? AND ?
+	// 		OR
+	// 		end_date BETWEEN ? AND ?
+	// 		OR IF end_date is NULL start_date UNDER ?
+	// 	`, subTotal.From, subTotal.To, subTotal.From, subTotal.To).
+	// 	Scan(&subscriptions)
+
+	// if result.Error != nil {
+	// 	return 0, result.Error
+	// }
+
+	sum := 0
+	for _, s := range subscriptions {
+		sum += s.Price
+	}
+
+	return sum, nil
+}

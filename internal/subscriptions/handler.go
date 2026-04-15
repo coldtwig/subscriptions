@@ -26,6 +26,7 @@ func NewSubscriptionsHandler(router *http.ServeMux, deps SubscriptionsHandlerDep
 	router.HandleFunc("GET /subscriptions", handler.GetAll())
 	router.HandleFunc("PUT /subscriptions/{id}", handler.Update())
 	router.HandleFunc("DELETE /subscriptions/{id}", handler.Delete())
+	router.HandleFunc("POST /subscriptions/total", handler.SumAll())
 
 	return handler
 }
@@ -158,5 +159,43 @@ func (handler *SubscriptionsHandler) Delete() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
+func (handler *SubscriptionsHandler) SumAll() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var body SubscriptionTotalRequest
+		err := json.NewDecoder(r.Body).Decode(&body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		from, err := time.Parse("01-2006", body.From)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		to, err := time.Parse("01-2006", body.To)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		sum, err := handler.SubscriptionsRepository.SumAll(&SubscriptionTotalFilter{
+			ServiceName: body.ServiceName,
+			UserID:      body.UserID,
+			From:        from,
+			To:          to,
+		})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(sum)
 	}
 }

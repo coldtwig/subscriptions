@@ -15,3 +15,10 @@ type Subscription struct {
 	StartDate   time.Time  `json:"start_date" validate:"required"`
 	EndDate     *time.Time `json:"end_date"`
 }
+
+type SubscriptionTotalFilter struct {
+	ServiceName string    `json:"service_name"`
+	UserID      uuid.UUID `json:"user_id"`
+	From        time.Time `json:"from"`
+	To          time.Time `json:"to"`
+}
